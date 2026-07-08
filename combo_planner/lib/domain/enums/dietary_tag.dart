@@ -1,0 +1,4 @@
+enum DietaryTag {
+  veg,
+  nonVeg
+}
