@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:isar/isar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/supabase_service.dart';
 
 class UserProvider with ChangeNotifier {
@@ -18,6 +19,7 @@ class UserProvider with ChangeNotifier {
   Set<String> dislikedTags = {};
   
   UserProvider() {
+    _loadLocalPreferences();
     _supabase.auth.onAuthStateChange.listen((data) {
       if (data.event == AuthChangeEvent.signedIn) {
         _isGuest = false;
@@ -46,6 +48,38 @@ class UserProvider with ChangeNotifier {
   void refreshState() {
     notifyListeners();
   }
+
+  Future<void> _loadLocalPreferences() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      likedTags = (prefs.getStringList('likedTags') ?? []).toSet();
+      dislikedTags = (prefs.getStringList('dislikedTags') ?? []).toSet();
+      notifyListeners();
+    } catch (_) {}
+  }
+
+  Future<void> savePreferences(Set<String> newLiked, Set<String> newDisliked) async {
+    likedTags = newLiked;
+    dislikedTags = newDisliked;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('likedTags', likedTags.toList());
+      await prefs.setStringList('dislikedTags', dislikedTags.toList());
+      
+      if (isAuthenticated && currentUser != null) {
+        await _supabase.from('user_preferences').upsert({
+          'user_id': currentUser!.id,
+          'liked_tags': likedTags.toList(),
+          'disliked_tags': dislikedTags.toList(),
+          'updated_at': DateTime.now().toIso8601String(),
+        });
+      }
+    } catch (e) {
+      debugPrint('Error saving preferences: $e');
+    }
+  }
   
   Future<void> _loadUserData() async {
     final user = currentUser;
@@ -71,8 +105,27 @@ class UserProvider with ChangeNotifier {
           .maybeSingle();
           
       if (prefsRes != null) {
-        likedTags = Set<String>.from(prefsRes['liked_tags'] as List<dynamic>? ?? []);
-        dislikedTags = Set<String>.from(prefsRes['disliked_tags'] as List<dynamic>? ?? []);
+        final cloudLiked = Set<String>.from(prefsRes['liked_tags'] as List<dynamic>? ?? []);
+        final cloudDisliked = Set<String>.from(prefsRes['disliked_tags'] as List<dynamic>? ?? []);
+        
+        // Merge strategy: Local swipe actions taken while guest > Cloud data
+        if (likedTags.isNotEmpty || dislikedTags.isNotEmpty) {
+          final mergedLiked = cloudLiked.union(likedTags);
+          final mergedDisliked = cloudDisliked.union(dislikedTags);
+          await savePreferences(mergedLiked, mergedDisliked); // upload merged back to cloud
+        } else {
+          likedTags = cloudLiked;
+          dislikedTags = cloudDisliked;
+          
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setStringList('likedTags', likedTags.toList());
+          await prefs.setStringList('dislikedTags', dislikedTags.toList());
+        }
+      } else {
+        // First login, push local guest tags up
+        if (likedTags.isNotEmpty || dislikedTags.isNotEmpty) {
+          await savePreferences(likedTags, dislikedTags);
+        }
       }
       
       notifyListeners();

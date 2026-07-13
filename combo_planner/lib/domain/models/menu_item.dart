@@ -27,4 +27,6 @@ class MenuItem {
   late String mallId;
   
   bool isBlacklisted = false;
+  bool isVendorCombo = false;
+  int estimatedPrepTimeMins = 10;
 }

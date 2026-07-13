@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:isar/isar.dart';
-import '../../data/seed/seed_data.dart';
+import '../../data/repositories/local_menu_repository.dart';
 import '../../providers/planner_provider.dart';
 import '../../theme/app_theme.dart';
 import 'home_screen.dart';
@@ -30,7 +30,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
       if (!alreadySeeded) {
         if (mounted) setState(() => _statusText = 'Loading menu data...');
-        await seedDatabase(widget.isar);
+        await LocalMenuRepository(widget.isar).seedFromJson();
         await PlannerProvider.markSeeded();
       }
     } catch (e, stack) {
@@ -42,11 +42,10 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 800));
 
     if (mounted) {
-      Navigator.pushReplacement(
-        context,
+      Navigator.of(context).pushReplacement(
         PageRouteBuilder(
-          pageBuilder: (_, __, ___) => HomeScreen(isar: widget.isar),
-          transitionsBuilder: (_, animation, __, child) =>
+          pageBuilder: (context, animation, secondaryAnimation) => HomeScreen(isar: widget.isar),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) =>
               FadeTransition(opacity: animation, child: child),
           transitionDuration: const Duration(milliseconds: 500),
         ),
@@ -89,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   .slideY(begin: 0.3, curve: Curves.easeOut),
               const SizedBox(height: 8),
               const Text(
-                'Chennai Edition 🌆',
+                'Chennai Edition',
                 style: TextStyle(color: Colors.white70, fontSize: 16),
               )
                   .animate(delay: 400.ms)

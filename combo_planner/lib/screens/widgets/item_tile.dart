@@ -5,13 +5,11 @@ import '../../theme/app_theme.dart';
 class ItemTile extends StatelessWidget {
   final MenuItem item;
   final VoidCallback onHotSwap;
-  final VoidCallback onReportMismatch;
 
   const ItemTile({
     super.key,
     required this.item,
     required this.onHotSwap,
-    required this.onReportMismatch,
   });
 
   @override
@@ -44,14 +42,10 @@ class ItemTile extends StatelessWidget {
                 ),
               ],
             ),
-            IconButton(
-              icon: const Icon(Icons.warning_amber_rounded, size: 20, color: Colors.orange),
-              onPressed: onReportMismatch,
-              tooltip: 'Report Mismatch',
-            )
           ],
         ),
       ),
     );
   }
 }
+

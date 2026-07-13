@@ -22,18 +22,28 @@ const StallSchema = CollectionSchema(
       name: r'cuisineType',
       type: IsarType.string,
     ),
-    r'mallId': PropertySchema(
+    r'isPureVeg': PropertySchema(
       id: 1,
+      name: r'isPureVeg',
+      type: IsarType.bool,
+    ),
+    r'mallId': PropertySchema(
+      id: 2,
       name: r'mallId',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'name',
       type: IsarType.string,
     ),
+    r'packagingCharge': PropertySchema(
+      id: 4,
+      name: r'packagingCharge',
+      type: IsarType.double,
+    ),
     r'stallId': PropertySchema(
-      id: 3,
+      id: 5,
       name: r'stallId',
       type: IsarType.string,
     )
@@ -86,9 +96,11 @@ void _stallSerialize(
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeString(offsets[0], object.cuisineType);
-  writer.writeString(offsets[1], object.mallId);
-  writer.writeString(offsets[2], object.name);
-  writer.writeString(offsets[3], object.stallId);
+  writer.writeBool(offsets[1], object.isPureVeg);
+  writer.writeString(offsets[2], object.mallId);
+  writer.writeString(offsets[3], object.name);
+  writer.writeDouble(offsets[4], object.packagingCharge);
+  writer.writeString(offsets[5], object.stallId);
 }
 
 Stall _stallDeserialize(
@@ -100,9 +112,11 @@ Stall _stallDeserialize(
   final object = Stall();
   object.cuisineType = reader.readString(offsets[0]);
   object.id = id;
-  object.mallId = reader.readString(offsets[1]);
-  object.name = reader.readString(offsets[2]);
-  object.stallId = reader.readString(offsets[3]);
+  object.isPureVeg = reader.readBool(offsets[1]);
+  object.mallId = reader.readString(offsets[2]);
+  object.name = reader.readString(offsets[3]);
+  object.packagingCharge = reader.readDouble(offsets[4]);
+  object.stallId = reader.readString(offsets[5]);
   return object;
 }
 
@@ -116,10 +130,14 @@ P _stallDeserializeProp<P>(
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 2:
       return (reader.readString(offset)) as P;
     case 3:
+      return (reader.readString(offset)) as P;
+    case 4:
+      return (reader.readDouble(offset)) as P;
+    case 5:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -494,6 +512,16 @@ extension StallQueryFilter on QueryBuilder<Stall, Stall, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Stall, Stall, QAfterFilterCondition> isPureVegEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isPureVeg',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Stall, Stall, QAfterFilterCondition> mallIdEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -751,6 +779,68 @@ extension StallQueryFilter on QueryBuilder<Stall, Stall, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Stall, Stall, QAfterFilterCondition> packagingChargeEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'packagingCharge',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterFilterCondition> packagingChargeGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'packagingCharge',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterFilterCondition> packagingChargeLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'packagingCharge',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterFilterCondition> packagingChargeBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'packagingCharge',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
   QueryBuilder<Stall, Stall, QAfterFilterCondition> stallIdEqualTo(
     String value, {
     bool caseSensitive = true,
@@ -899,6 +989,18 @@ extension StallQuerySortBy on QueryBuilder<Stall, Stall, QSortBy> {
     });
   }
 
+  QueryBuilder<Stall, Stall, QAfterSortBy> sortByIsPureVeg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPureVeg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterSortBy> sortByIsPureVegDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPureVeg', Sort.desc);
+    });
+  }
+
   QueryBuilder<Stall, Stall, QAfterSortBy> sortByMallId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'mallId', Sort.asc);
@@ -920,6 +1022,18 @@ extension StallQuerySortBy on QueryBuilder<Stall, Stall, QSortBy> {
   QueryBuilder<Stall, Stall, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterSortBy> sortByPackagingCharge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'packagingCharge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterSortBy> sortByPackagingChargeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'packagingCharge', Sort.desc);
     });
   }
 
@@ -961,6 +1075,18 @@ extension StallQuerySortThenBy on QueryBuilder<Stall, Stall, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Stall, Stall, QAfterSortBy> thenByIsPureVeg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPureVeg', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterSortBy> thenByIsPureVegDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isPureVeg', Sort.desc);
+    });
+  }
+
   QueryBuilder<Stall, Stall, QAfterSortBy> thenByMallId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'mallId', Sort.asc);
@@ -985,6 +1111,18 @@ extension StallQuerySortThenBy on QueryBuilder<Stall, Stall, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Stall, Stall, QAfterSortBy> thenByPackagingCharge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'packagingCharge', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QAfterSortBy> thenByPackagingChargeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'packagingCharge', Sort.desc);
+    });
+  }
+
   QueryBuilder<Stall, Stall, QAfterSortBy> thenByStallId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'stallId', Sort.asc);
@@ -1006,6 +1144,12 @@ extension StallQueryWhereDistinct on QueryBuilder<Stall, Stall, QDistinct> {
     });
   }
 
+  QueryBuilder<Stall, Stall, QDistinct> distinctByIsPureVeg() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isPureVeg');
+    });
+  }
+
   QueryBuilder<Stall, Stall, QDistinct> distinctByMallId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1017,6 +1161,12 @@ extension StallQueryWhereDistinct on QueryBuilder<Stall, Stall, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Stall, Stall, QDistinct> distinctByPackagingCharge() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'packagingCharge');
     });
   }
 
@@ -1041,6 +1191,12 @@ extension StallQueryProperty on QueryBuilder<Stall, Stall, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Stall, bool, QQueryOperations> isPureVegProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isPureVeg');
+    });
+  }
+
   QueryBuilder<Stall, String, QQueryOperations> mallIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'mallId');
@@ -1050,6 +1206,12 @@ extension StallQueryProperty on QueryBuilder<Stall, Stall, QQueryProperty> {
   QueryBuilder<Stall, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<Stall, double, QQueryOperations> packagingChargeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'packagingCharge');
     });
   }
 

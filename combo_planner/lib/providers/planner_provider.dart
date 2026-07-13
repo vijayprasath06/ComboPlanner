@@ -6,7 +6,7 @@ import '../domain/models/meal_plan.dart';
 import '../domain/models/plan_history.dart';
 import '../domain/models/trending_combo.dart';
 import '../data/repositories/menu_repository.dart';
-import '../services/groq_service.dart';
+import '../services/time_engine_service.dart';
 import '../services/knapsack_service.dart';
 import '../services/supabase_service.dart';
 import '../domain/enums/engine_category.dart';
@@ -15,7 +15,7 @@ import '../domain/models/menu_item.dart';
 class PlannerProvider with ChangeNotifier {
   final MenuRepository repository;
   final Isar isar;
-  final GroqService groqService = GroqService();
+  final TimeEngineService timeEngine = TimeEngineService();
 
   PlannerProvider(this.repository, this.isar);
 
@@ -24,6 +24,17 @@ class PlannerProvider with ChangeNotifier {
   int vegCount = 2;
   int nonVegCount = 2;
   int vendorLimit = 2;
+  bool strictPureVeg = false;
+
+  bool applyZomatoGold = false;
+  bool applySwiggyDineout = false;
+  String mealTime = 'Now';
+
+  bool get isGenerateDisabled {
+    if (vegCount + nonVegCount == 0) return true;
+    if (vendorLimit == 1 && strictPureVeg && vegCount > 0 && nonVegCount > 0) return true;
+    return false;
+  }
 
   // User food preferences (wired in from UserProvider after login)
   Set<String> userLikedTags    = {};
@@ -75,6 +86,30 @@ class PlannerProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void toggleStrictPureVeg(bool value) {
+    strictPureVeg = value;
+    notifyListeners();
+  }
+
+  void toggleZomatoGold(bool value) {
+    applyZomatoGold = value;
+    notifyListeners();
+  }
+
+  void toggleSwiggyDineout(bool value) {
+    applySwiggyDineout = value;
+    notifyListeners();
+  }
+
+  void updateMealTime(String time) {
+    mealTime = time;
+    notifyListeners();
+  }
+
+  void refreshState() {
+    notifyListeners();
+  }
+
   /// Called by UserProvider after login to sync food preferences.
   void setUserPreferences({
     required Set<String> liked,
@@ -96,19 +131,22 @@ class PlannerProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      whitelistedCategories = await groqService.getWhitelistedCategories();
+      whitelistedCategories = timeEngine.getWhitelistedCategories();
 
-      var allItems = await repository.getItemsForMall(selectedMall!.mallId);
-      allItems = allItems
-          .where((item) => !blacklistedItemIds.contains(item.internalId))
-          .toList();
+      double effectiveBudget = budget;
+      if (applyZomatoGold || applySwiggyDineout) {
+        effectiveBudget = budget / 0.85; // 15% discount inflation
+      }
 
       final params = KnapsackParams(
-        budget: budget,
+        isarDirectory: isar.directory!,
+        mallId: selectedMall!.mallId,
+        blacklistedItemIds: blacklistedItemIds,
+        strictPureVeg: strictPureVeg,
+        budget: effectiveBudget,
         vegCount: vegCount,
         nonVegCount: nonVegCount,
         maxStalls: vendorLimit,
-        availableItems: allItems,
         allowedCategories: whitelistedCategories,
         likedTags: userLikedTags,
         dislikedTags: userDislikedTags,
@@ -163,13 +201,6 @@ class PlannerProvider with ChangeNotifier {
       _isHotSwapping = false;
       notifyListeners();
     }
-  }
-
-  Future<void> reportMismatch(String internalId, double newPrice) async {
-    await repository.reportPriceMismatch(internalId, newPrice);
-    // Note: In Phase 3 this will go to Supabase price_reports table.
-    // For now keep local update but do NOT auto-regenerate
-    // (prevents state corruption while user is viewing plan)
   }
 
   // ── Plan History ──────────────────────────────────────────────────────────

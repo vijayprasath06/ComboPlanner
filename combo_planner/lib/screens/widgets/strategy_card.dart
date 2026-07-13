@@ -46,7 +46,6 @@ class StrategyCard extends StatelessWidget {
                       ...items.map((item) => ItemTile(
                         item: item,
                         onHotSwap: () => provider.hotSwapItem(item.internalId),
-                        onReportMismatch: () => provider.reportMismatch(item.internalId, item.basePrice),
                       )),
                       const Divider(),
                     ],

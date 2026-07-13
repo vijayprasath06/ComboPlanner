@@ -9,7 +9,7 @@ enum StrategyType {
 class MealPlan {
   final StrategyType strategy;
   final Map<int, List<MenuItem>> assignments;
-  final double totalCost;
+  double totalCost;
   final List<String> stallsUsed;
   final bool withinBudget;
 

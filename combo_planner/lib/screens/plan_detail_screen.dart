@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../domain/models/meal_plan.dart';
 import '../../domain/models/menu_item.dart';
 import '../../providers/planner_provider.dart';
+import '../../data/repositories/menu_repository.dart';
 import '../../services/plan_share_service.dart';
 import '../../theme/app_theme.dart';
 
@@ -70,30 +72,82 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
     }
   }
 
-  Future<void> _hotSwap(BuildContext ctx, String internalId) async {
+  Future<void> _hotSwap(BuildContext ctx, MenuItem item) async {
     HapticFeedback.heavyImpact();
-    // hotSwapItem is now async and guarded — no concurrent calls
-    await ctx.read<PlannerProvider>().hotSwapItem(internalId);
-  }
-
-  void _reportMismatch(BuildContext ctx, MenuItem item) {
-    showModalBottomSheet(
-      context: ctx,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (_) => _MismatchSheet(item: item, onSubmit: (newPrice) {
-        ctx.read<PlannerProvider>().reportMismatch(item.internalId, newPrice);
-        Navigator.pop(ctx);
+    
+    // Get alternatives from the same stall
+    final repo = ctx.read<MenuRepository>();
+    final alternatives = await repo.getAlternativesFromStall(
+      item.stallId, 
+      item.engineCategory.name, 
+      item.dietaryTag.name
+    );
+    
+    final otherOptions = alternatives.where((a) => a.internalId != item.internalId).toList();
+    
+    if (otherOptions.isEmpty) {
+      if (ctx.mounted) {
         ScaffoldMessenger.of(ctx).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Price mismatch reported. Syncing...'),
-            backgroundColor: Colors.green,
+          const SnackBar(content: Text('No alternatives available from this stall in this category.')),
+        );
+      }
+      return;
+    }
+
+    if (!ctx.mounted) return;
+    
+    // Show bottom sheet
+    final selectedNewItem = await showModalBottomSheet<MenuItem>(
+      context: ctx,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Swap ${item.name}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              Flexible(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: otherOptions.length,
+                  itemBuilder: (context, index) {
+                    final alt = otherOptions[index];
+                    return ListTile(
+                      title: Text(alt.name),
+                      trailing: Text('₹${alt.taxAdjustedPrice.toStringAsFixed(0)}'),
+                      onTap: () => Navigator.pop(context, alt),
+                    );
+                  },
+                ),
+              ),
+            ],
           ),
         );
-      }),
+      },
     );
+
+    if (selectedNewItem != null && ctx.mounted) {
+      // Update plan locally
+      setState(() {
+        for (var person in _plan.assignments.keys) {
+          final items = _plan.assignments[person]!;
+          final idx = items.indexWhere((i) => i.internalId == item.internalId);
+          if (idx != -1) {
+            items[idx] = selectedNewItem;
+            break;
+          }
+        }
+        // Recalculate cost
+        double total = 0;
+        for (var items in _plan.assignments.values) {
+          total += items.fold(0.0, (sum, i) => sum + i.taxAdjustedPrice);
+        }
+        _plan.totalCost = total;
+      });
+      ctx.read<PlannerProvider>().refreshState();
+    }
   }
 
   Map<String, List<MenuItem>> _groupByStall() {
@@ -317,12 +371,11 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
                         ...items.asMap().entries.map((entry) {
                           final item = entry.value;
                           final isLast = entry.key == items.length - 1;
-                          return _SwipeableItemTile(
-                            item: item,
-                            showDivider: !isLast,
-                            onHotSwap: () => _hotSwap(context, item.internalId),
-                            onReportMismatch: () => _reportMismatch(context, item),
-                          );
+                            return _SwipeableItemTile(
+                              item: item,
+                              showDivider: !isLast,
+                              onHotSwap: () => _hotSwap(context, item),
+                            );
                         }),
                       ],
                     ),
@@ -362,20 +415,33 @@ class _PlanDetailScreenState extends State<PlanDetailScreen> {
               ),
             ),
             const SizedBox(width: 8),
+            // Bill Splitter & Pay button
             Expanded(
               child: OutlinedButton.icon(
-                onPressed: () => Navigator.pop(context),
-                icon: const Icon(Icons.arrow_back_rounded),
-                label: const Text('Back'),
+                onPressed: () async {
+                  HapticFeedback.lightImpact();
+                  final total = _plan.totalCost;
+                  final perPerson = total / _plan.assignments.length;
+                  final uri = Uri.parse('upi://pay?pa=receiver@upi&pn=Foodie&am=${total.toStringAsFixed(2)}&cu=INR');
+                  
+                  final shareText = "🍔 Combo Planner Bill Split 🍔\nTotal: ₹${total.toStringAsFixed(0)}\nEach person owes: ₹${perPerson.toStringAsFixed(0)}\nPay here: $uri";
+                  PlanShareService.share(shareText);
+                  
+                  if (await canLaunchUrl(uri)) {
+                    await launchUrl(uri);
+                  }
+                },
+                icon: const Icon(Icons.currency_rupee_rounded, size: 18),
+                label: const Text('Split Bill', style: TextStyle(fontSize: 13)),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppTheme.primary,
-                  side: const BorderSide(color: AppTheme.primary),
+                  foregroundColor: Colors.teal,
+                  side: const BorderSide(color: Colors.teal),
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Expanded(
               flex: 2,
               child: ElevatedButton.icon(
@@ -481,13 +547,11 @@ class _SwipeableItemTile extends StatelessWidget {
   final MenuItem item;
   final bool showDivider;
   final VoidCallback onHotSwap;
-  final VoidCallback onReportMismatch;
 
   const _SwipeableItemTile({
     required this.item,
     required this.showDivider,
     required this.onHotSwap,
-    required this.onReportMismatch,
   });
 
   String _categoryEmoji(String category) {
@@ -586,17 +650,6 @@ class _SwipeableItemTile extends StatelessWidget {
                       '₹${item.taxAdjustedPrice.toStringAsFixed(0)}',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
-                    GestureDetector(
-                      onTap: onReportMismatch,
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.warning_amber_rounded, size: 11, color: Colors.orange),
-                          SizedBox(width: 2),
-                          Text('Report', style: TextStyle(fontSize: 10, color: Colors.orange)),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ],
@@ -610,71 +663,3 @@ class _SwipeableItemTile extends StatelessWidget {
   }
 }
 
-class _MismatchSheet extends StatefulWidget {
-  final MenuItem item;
-  final void Function(double newPrice) onSubmit;
-
-  const _MismatchSheet({required this.item, required this.onSubmit});
-
-  @override
-  State<_MismatchSheet> createState() => _MismatchSheetState();
-}
-
-class _MismatchSheetState extends State<_MismatchSheet> {
-  final _controller = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.text = widget.item.basePrice.toStringAsFixed(0);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.warning_amber_rounded, color: Colors.orange),
-                const SizedBox(width: 8),
-                Text('Report Price Mismatch', style: Theme.of(context).textTheme.titleMedium),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text('Item: ${widget.item.name}', style: const TextStyle(color: AppTheme.textSecondary)),
-            Text('Stall: ${widget.item.stallName}', style: const TextStyle(color: AppTheme.textSecondary)),
-            const SizedBox(height: 16),
-            Text('Our database shows ₹${widget.item.basePrice.toStringAsFixed(0)} (base). What is the actual price on the menu board?'),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Actual Price (₹)',
-                prefixText: '₹ ',
-              ),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  final price = double.tryParse(_controller.text);
-                  if (price != null) widget.onSubmit(price);
-                },
-                child: const Text('Submit Report'),
-              ),
-            ),
-            const SizedBox(height: 8),
-          ],
-        ),
-      ),
-    );
-  }
-}

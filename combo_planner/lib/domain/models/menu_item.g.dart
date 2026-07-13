@@ -34,43 +34,53 @@ const MenuItemSchema = CollectionSchema(
       type: IsarType.string,
       enumMap: _MenuItemengineCategoryEnumValueMap,
     ),
-    r'internalId': PropertySchema(
+    r'estimatedPrepTimeMins': PropertySchema(
       id: 3,
+      name: r'estimatedPrepTimeMins',
+      type: IsarType.long,
+    ),
+    r'internalId': PropertySchema(
+      id: 4,
       name: r'internalId',
       type: IsarType.string,
     ),
     r'isBlacklisted': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'isBlacklisted',
       type: IsarType.bool,
     ),
+    r'isVendorCombo': PropertySchema(
+      id: 6,
+      name: r'isVendorCombo',
+      type: IsarType.bool,
+    ),
     r'mallId': PropertySchema(
-      id: 5,
+      id: 7,
       name: r'mallId',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'name',
       type: IsarType.string,
     ),
     r'stallId': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'stallId',
       type: IsarType.string,
     ),
     r'stallName': PropertySchema(
-      id: 8,
+      id: 10,
       name: r'stallName',
       type: IsarType.string,
     ),
     r'tags': PropertySchema(
-      id: 9,
+      id: 11,
       name: r'tags',
       type: IsarType.stringList,
     ),
     r'taxAdjustedPrice': PropertySchema(
-      id: 10,
+      id: 12,
       name: r'taxAdjustedPrice',
       type: IsarType.double,
     )
@@ -121,14 +131,16 @@ void _menuItemSerialize(
   writer.writeDouble(offsets[0], object.basePrice);
   writer.writeString(offsets[1], object.dietaryTag.name);
   writer.writeString(offsets[2], object.engineCategory.name);
-  writer.writeString(offsets[3], object.internalId);
-  writer.writeBool(offsets[4], object.isBlacklisted);
-  writer.writeString(offsets[5], object.mallId);
-  writer.writeString(offsets[6], object.name);
-  writer.writeString(offsets[7], object.stallId);
-  writer.writeString(offsets[8], object.stallName);
-  writer.writeStringList(offsets[9], object.tags);
-  writer.writeDouble(offsets[10], object.taxAdjustedPrice);
+  writer.writeLong(offsets[3], object.estimatedPrepTimeMins);
+  writer.writeString(offsets[4], object.internalId);
+  writer.writeBool(offsets[5], object.isBlacklisted);
+  writer.writeBool(offsets[6], object.isVendorCombo);
+  writer.writeString(offsets[7], object.mallId);
+  writer.writeString(offsets[8], object.name);
+  writer.writeString(offsets[9], object.stallId);
+  writer.writeString(offsets[10], object.stallName);
+  writer.writeStringList(offsets[11], object.tags);
+  writer.writeDouble(offsets[12], object.taxAdjustedPrice);
 }
 
 MenuItem _menuItemDeserialize(
@@ -145,15 +157,17 @@ MenuItem _menuItemDeserialize(
   object.engineCategory = _MenuItemengineCategoryValueEnumMap[
           reader.readStringOrNull(offsets[2])] ??
       EngineCategory.main;
+  object.estimatedPrepTimeMins = reader.readLong(offsets[3]);
   object.id = id;
-  object.internalId = reader.readString(offsets[3]);
-  object.isBlacklisted = reader.readBool(offsets[4]);
-  object.mallId = reader.readString(offsets[5]);
-  object.name = reader.readString(offsets[6]);
-  object.stallId = reader.readString(offsets[7]);
-  object.stallName = reader.readString(offsets[8]);
-  object.tags = reader.readStringList(offsets[9]) ?? [];
-  object.taxAdjustedPrice = reader.readDouble(offsets[10]);
+  object.internalId = reader.readString(offsets[4]);
+  object.isBlacklisted = reader.readBool(offsets[5]);
+  object.isVendorCombo = reader.readBool(offsets[6]);
+  object.mallId = reader.readString(offsets[7]);
+  object.name = reader.readString(offsets[8]);
+  object.stallId = reader.readString(offsets[9]);
+  object.stallName = reader.readString(offsets[10]);
+  object.tags = reader.readStringList(offsets[11]) ?? [];
+  object.taxAdjustedPrice = reader.readDouble(offsets[12]);
   return object;
 }
 
@@ -175,20 +189,24 @@ P _menuItemDeserializeProp<P>(
               reader.readStringOrNull(offset)] ??
           EngineCategory.main) as P;
     case 3:
-      return (reader.readString(offset)) as P;
+      return (reader.readLong(offset)) as P;
     case 4:
-      return (reader.readBool(offset)) as P;
+      return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 6:
-      return (reader.readString(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 7:
       return (reader.readString(offset)) as P;
     case 8:
       return (reader.readString(offset)) as P;
     case 9:
-      return (reader.readStringList(offset) ?? []) as P;
+      return (reader.readString(offset)) as P;
     case 10:
+      return (reader.readString(offset)) as P;
+    case 11:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 12:
       return (reader.readDouble(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -631,6 +649,62 @@ extension MenuItemQueryFilter
     });
   }
 
+  QueryBuilder<MenuItem, MenuItem, QAfterFilterCondition>
+      estimatedPrepTimeMinsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'estimatedPrepTimeMins',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterFilterCondition>
+      estimatedPrepTimeMinsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'estimatedPrepTimeMins',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterFilterCondition>
+      estimatedPrepTimeMinsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'estimatedPrepTimeMins',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterFilterCondition>
+      estimatedPrepTimeMinsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'estimatedPrepTimeMins',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<MenuItem, MenuItem, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -819,6 +893,16 @@ extension MenuItemQueryFilter
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'isBlacklisted',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterFilterCondition> isVendorComboEqualTo(
+      bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isVendorCombo',
         value: value,
       ));
     });
@@ -1671,6 +1755,19 @@ extension MenuItemQuerySortBy on QueryBuilder<MenuItem, MenuItem, QSortBy> {
     });
   }
 
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy> sortByEstimatedPrepTimeMins() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPrepTimeMins', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy>
+      sortByEstimatedPrepTimeMinsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPrepTimeMins', Sort.desc);
+    });
+  }
+
   QueryBuilder<MenuItem, MenuItem, QAfterSortBy> sortByInternalId() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'internalId', Sort.asc);
@@ -1692,6 +1789,18 @@ extension MenuItemQuerySortBy on QueryBuilder<MenuItem, MenuItem, QSortBy> {
   QueryBuilder<MenuItem, MenuItem, QAfterSortBy> sortByIsBlacklistedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isBlacklisted', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy> sortByIsVendorCombo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isVendorCombo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy> sortByIsVendorComboDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isVendorCombo', Sort.desc);
     });
   }
 
@@ -1794,6 +1903,19 @@ extension MenuItemQuerySortThenBy
     });
   }
 
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy> thenByEstimatedPrepTimeMins() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPrepTimeMins', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy>
+      thenByEstimatedPrepTimeMinsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'estimatedPrepTimeMins', Sort.desc);
+    });
+  }
+
   QueryBuilder<MenuItem, MenuItem, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -1827,6 +1949,18 @@ extension MenuItemQuerySortThenBy
   QueryBuilder<MenuItem, MenuItem, QAfterSortBy> thenByIsBlacklistedDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isBlacklisted', Sort.desc);
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy> thenByIsVendorCombo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isVendorCombo', Sort.asc);
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QAfterSortBy> thenByIsVendorComboDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isVendorCombo', Sort.desc);
     });
   }
 
@@ -1914,6 +2048,13 @@ extension MenuItemQueryWhereDistinct
     });
   }
 
+  QueryBuilder<MenuItem, MenuItem, QDistinct>
+      distinctByEstimatedPrepTimeMins() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'estimatedPrepTimeMins');
+    });
+  }
+
   QueryBuilder<MenuItem, MenuItem, QDistinct> distinctByInternalId(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1924,6 +2065,12 @@ extension MenuItemQueryWhereDistinct
   QueryBuilder<MenuItem, MenuItem, QDistinct> distinctByIsBlacklisted() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isBlacklisted');
+    });
+  }
+
+  QueryBuilder<MenuItem, MenuItem, QDistinct> distinctByIsVendorCombo() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isVendorCombo');
     });
   }
 
@@ -1995,6 +2142,13 @@ extension MenuItemQueryProperty
     });
   }
 
+  QueryBuilder<MenuItem, int, QQueryOperations>
+      estimatedPrepTimeMinsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'estimatedPrepTimeMins');
+    });
+  }
+
   QueryBuilder<MenuItem, String, QQueryOperations> internalIdProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'internalId');
@@ -2004,6 +2158,12 @@ extension MenuItemQueryProperty
   QueryBuilder<MenuItem, bool, QQueryOperations> isBlacklistedProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isBlacklisted');
+    });
+  }
+
+  QueryBuilder<MenuItem, bool, QQueryOperations> isVendorComboProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isVendorCombo');
     });
   }
 

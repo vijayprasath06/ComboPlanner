@@ -22,10 +22,12 @@ class GeofenceService {
         }
       }
 
-      // Get current position with a timeout
-      final position = await Geolocator.getCurrentPosition(
+      // Get last known position first (battery-friendly), fallback to current position
+      Position? position = await Geolocator.getLastKnownPosition();
+      
+      position ??= await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
+          accuracy: LocationAccuracy.medium,
           timeLimit: Duration(seconds: 8),
         ),
       );

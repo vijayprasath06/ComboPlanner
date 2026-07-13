@@ -1,0 +1,408 @@
+{
+  "malls": [
+    {
+      "mallId": "mall_vr_chennai",
+      "name": "VR Mall, Chennai",
+      "location": "Anna Nagar",
+      "isActive": true
+    },
+    {
+      "mallId": "mall_ea_chennai",
+      "name": "Express Avenue",
+      "location": "Royapettah",
+      "isActive": true
+    }
+  ],
+  "stalls": [
+    {
+      "stallId": "e60e1cd7-46d2-4b4d-bd94-7cb8fa453150",
+      "mallId": "mall_vr_chennai",
+      "name": "A2B (Adyar Ananda Bhavan)",
+      "category": "South Indian",
+      "isPureVeg": true,
+      "packagingCharge": 10.0
+    },
+    {
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "KFC",
+      "category": "Fast Food",
+      "isPureVeg": false,
+      "packagingCharge": 25.0
+    },
+    {
+      "stallId": "52e9523e-b3d9-46c5-bf70-4573d56ce5b8",
+      "mallId": "mall_vr_chennai",
+      "name": "Taco Bell",
+      "category": "Mexican",
+      "isPureVeg": false,
+      "packagingCharge": 15.0
+    },
+    {
+      "stallId": "11d9abf2-f779-47ef-8d06-6c788809c94f",
+      "mallId": "mall_vr_chennai",
+      "name": "Kailash Parbat",
+      "category": "North Indian",
+      "isPureVeg": true,
+      "packagingCharge": 20.0
+    }
+  ],
+  "items": [
+    {
+      "internalId": "6cc6e570-addc-429b-a2ff-dfa383b201bb",
+      "stallId": "e60e1cd7-46d2-4b4d-bd94-7cb8fa453150",
+      "mallId": "mall_vr_chennai",
+      "name": "Mini Tiffin Combo",
+      "basePrice": 140.0,
+      "taxAdjustedPrice": 147.0,
+      "dietaryTag": "veg",
+      "engineCategory": "main",
+      "tags": [
+        "south indian",
+        "combo",
+        "breakfast"
+      ],
+      "isVendorCombo": true,
+      "estimatedPrepTimeMins": 5
+    },
+    {
+      "internalId": "85265151-91e6-47c4-8fec-26df9388b79f",
+      "stallId": "e60e1cd7-46d2-4b4d-bd94-7cb8fa453150",
+      "mallId": "mall_vr_chennai",
+      "name": "Masala Dosa",
+      "basePrice": 95.0,
+      "taxAdjustedPrice": 99.75,
+      "dietaryTag": "veg",
+      "engineCategory": "main",
+      "tags": [
+        "south indian",
+        "dosa"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 8
+    },
+    {
+      "internalId": "cd8c4938-95a5-41c8-8004-1eff1f1b425c",
+      "stallId": "e60e1cd7-46d2-4b4d-bd94-7cb8fa453150",
+      "mallId": "mall_vr_chennai",
+      "name": "Paneer Butter Masala Dosa",
+      "basePrice": 130.0,
+      "taxAdjustedPrice": 136.5,
+      "dietaryTag": "veg",
+      "engineCategory": "main",
+      "tags": [
+        "south indian",
+        "paneer",
+        "dosa"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 10
+    },
+    {
+      "internalId": "9a1cdfbd-d15e-4bc9-aff3-95d93ab67a2d",
+      "stallId": "e60e1cd7-46d2-4b4d-bd94-7cb8fa453150",
+      "mallId": "mall_vr_chennai",
+      "name": "Medu Vada (2 pcs)",
+      "basePrice": 55.0,
+      "taxAdjustedPrice": 57.75,
+      "dietaryTag": "veg",
+      "engineCategory": "side",
+      "tags": [
+        "snack",
+        "fried"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 2
+    },
+    {
+      "internalId": "642ef27c-b89a-41ca-be2a-d07c5184b899",
+      "stallId": "e60e1cd7-46d2-4b4d-bd94-7cb8fa453150",
+      "mallId": "mall_vr_chennai",
+      "name": "Filter Coffee",
+      "basePrice": 35.0,
+      "taxAdjustedPrice": 36.75,
+      "dietaryTag": "veg",
+      "engineCategory": "beverage",
+      "tags": [
+        "hot beverage",
+        "coffee"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 2
+    },
+    {
+      "internalId": "a3fb504c-a33a-47db-8d25-8728ed65ed90",
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "Zinger Burger Meal (Fries + Coke)",
+      "basePrice": 320.0,
+      "taxAdjustedPrice": 336.0,
+      "dietaryTag": "nonVeg",
+      "engineCategory": "main",
+      "tags": [
+        "burger",
+        "fried chicken",
+        "combo"
+      ],
+      "isVendorCombo": true,
+      "estimatedPrepTimeMins": 7
+    },
+    {
+      "internalId": "b8bd59ab-df5e-48ad-b501-0b1686b7c942",
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "Classic Zinger Burger",
+      "basePrice": 189.0,
+      "taxAdjustedPrice": 198.45000000000002,
+      "dietaryTag": "nonVeg",
+      "engineCategory": "main",
+      "tags": [
+        "burger",
+        "fried chicken"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 5
+    },
+    {
+      "internalId": "0674e8d6-1ab5-4114-bdc1-3957da45765a",
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "Veg Zinger Burger",
+      "basePrice": 169.0,
+      "taxAdjustedPrice": 177.45000000000002,
+      "dietaryTag": "veg",
+      "engineCategory": "main",
+      "tags": [
+        "burger",
+        "veg"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 5
+    },
+    {
+      "internalId": "cff7c212-f0b6-4087-9d8b-a414ae12b1e4",
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "Hot & Crispy (2 pcs)",
+      "basePrice": 210.0,
+      "taxAdjustedPrice": 220.5,
+      "dietaryTag": "nonVeg",
+      "engineCategory": "main",
+      "tags": [
+        "fried chicken"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 8
+    },
+    {
+      "internalId": "29c0c35e-6a5a-433c-9889-f8cca44e3fe9",
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "Large Fries",
+      "basePrice": 119.0,
+      "taxAdjustedPrice": 124.95,
+      "dietaryTag": "veg",
+      "engineCategory": "side",
+      "tags": [
+        "potato",
+        "fried"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 3
+    },
+    {
+      "internalId": "10c73ce6-d996-452d-9fe5-b84dcad029a9",
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "Popcorn Chicken (Medium)",
+      "basePrice": 169.0,
+      "taxAdjustedPrice": 177.45000000000002,
+      "dietaryTag": "nonVeg",
+      "engineCategory": "side",
+      "tags": [
+        "fried chicken",
+        "snack"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 4
+    },
+    {
+      "internalId": "448ce7e8-aabf-41a7-a0dc-fd54e09475f5",
+      "stallId": "e1d99fcd-4970-4efb-96ee-4727d72aeb2a",
+      "mallId": "mall_vr_chennai",
+      "name": "Pepsi Can",
+      "basePrice": 60.0,
+      "taxAdjustedPrice": 63.0,
+      "dietaryTag": "veg",
+      "engineCategory": "beverage",
+      "tags": [
+        "cold beverage",
+        "soda"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 1
+    },
+    {
+      "internalId": "7c08f324-0a5e-4d2d-af0b-7af922540f92",
+      "stallId": "52e9523e-b3d9-46c5-bf70-4573d56ce5b8",
+      "mallId": "mall_vr_chennai",
+      "name": "Naked Chicken Taco Meal",
+      "basePrice": 299.0,
+      "taxAdjustedPrice": 313.95,
+      "dietaryTag": "nonVeg",
+      "engineCategory": "main",
+      "tags": [
+        "taco",
+        "chicken",
+        "combo"
+      ],
+      "isVendorCombo": true,
+      "estimatedPrepTimeMins": 6
+    },
+    {
+      "internalId": "d7724ea7-e6d3-47f6-922e-0160ef28cf79",
+      "stallId": "52e9523e-b3d9-46c5-bf70-4573d56ce5b8",
+      "mallId": "mall_vr_chennai",
+      "name": "Crunchy Veg Taco",
+      "basePrice": 99.0,
+      "taxAdjustedPrice": 103.95,
+      "dietaryTag": "veg",
+      "engineCategory": "main",
+      "tags": [
+        "taco",
+        "veg"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 4
+    },
+    {
+      "internalId": "55ca5fff-234e-46a3-bb27-4b0257e17344",
+      "stallId": "52e9523e-b3d9-46c5-bf70-4573d56ce5b8",
+      "mallId": "mall_vr_chennai",
+      "name": "Chicken Quesadilla",
+      "basePrice": 149.0,
+      "taxAdjustedPrice": 156.45000000000002,
+      "dietaryTag": "nonVeg",
+      "engineCategory": "main",
+      "tags": [
+        "quesadilla",
+        "chicken"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 7
+    },
+    {
+      "internalId": "315f0d8e-7b51-48d2-91f0-ac7378f02d8c",
+      "stallId": "52e9523e-b3d9-46c5-bf70-4573d56ce5b8",
+      "mallId": "mall_vr_chennai",
+      "name": "Loaded Veg Nachos",
+      "basePrice": 129.0,
+      "taxAdjustedPrice": 135.45000000000002,
+      "dietaryTag": "veg",
+      "engineCategory": "side",
+      "tags": [
+        "nachos",
+        "cheese",
+        "snack"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 3
+    },
+    {
+      "internalId": "fa29f035-310f-41bf-8b06-e2dafe493bcd",
+      "stallId": "52e9523e-b3d9-46c5-bf70-4573d56ce5b8",
+      "mallId": "mall_vr_chennai",
+      "name": "Churros & Chocolate",
+      "basePrice": 89.0,
+      "taxAdjustedPrice": 93.45,
+      "dietaryTag": "veg",
+      "engineCategory": "side",
+      "tags": [
+        "dessert",
+        "sweet"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 4
+    },
+    {
+      "internalId": "d46570f9-6f78-4fe1-8432-3f95c9c2842c",
+      "stallId": "52e9523e-b3d9-46c5-bf70-4573d56ce5b8",
+      "mallId": "mall_vr_chennai",
+      "name": "Iced Tea",
+      "basePrice": 70.0,
+      "taxAdjustedPrice": 73.5,
+      "dietaryTag": "veg",
+      "engineCategory": "beverage",
+      "tags": [
+        "cold beverage",
+        "tea"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 1
+    },
+    {
+      "internalId": "2eddbc5b-9674-481c-9717-179027e835f1",
+      "stallId": "11d9abf2-f779-47ef-8d06-6c788809c94f",
+      "mallId": "mall_vr_chennai",
+      "name": "Chole Bhature",
+      "basePrice": 220.0,
+      "taxAdjustedPrice": 231.0,
+      "dietaryTag": "veg",
+      "engineCategory": "main",
+      "tags": [
+        "north indian",
+        "heavy"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 12
+    },
+    {
+      "internalId": "10769c8d-55d0-4b93-a3a7-719409196609",
+      "stallId": "11d9abf2-f779-47ef-8d06-6c788809c94f",
+      "mallId": "mall_vr_chennai",
+      "name": "Pani Puri (6 pcs)",
+      "basePrice": 80.0,
+      "taxAdjustedPrice": 84.0,
+      "dietaryTag": "veg",
+      "engineCategory": "side",
+      "tags": [
+        "chaat",
+        "snack"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 3
+    },
+    {
+      "internalId": "f947d2d3-843a-4571-9623-2277e72e018c",
+      "stallId": "11d9abf2-f779-47ef-8d06-6c788809c94f",
+      "mallId": "mall_vr_chennai",
+      "name": "Samosa Chaat",
+      "basePrice": 110.0,
+      "taxAdjustedPrice": 115.5,
+      "dietaryTag": "veg",
+      "engineCategory": "side",
+      "tags": [
+        "chaat",
+        "snack"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 5
+    },
+    {
+      "internalId": "d2f5e941-9e5e-4034-bfe7-6c8bbc314c42",
+      "stallId": "11d9abf2-f779-47ef-8d06-6c788809c94f",
+      "mallId": "mall_vr_chennai",
+      "name": "Sweet Lassi",
+      "basePrice": 90.0,
+      "taxAdjustedPrice": 94.5,
+      "dietaryTag": "veg",
+      "engineCategory": "beverage",
+      "tags": [
+        "cold beverage",
+        "sweet"
+      ],
+      "isVendorCombo": false,
+      "estimatedPrepTimeMins": 2
+    }
+  ]
+}

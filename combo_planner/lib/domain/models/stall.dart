@@ -12,4 +12,7 @@ class Stall {
   late String name;
   late String mallId;
   late String cuisineType;
+  
+  double packagingCharge = 0.0;
+  bool isPureVeg = false;
 }

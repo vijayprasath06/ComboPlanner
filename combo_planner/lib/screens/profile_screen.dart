@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:isar/isar.dart';
 import '../providers/user_provider.dart';
 import '../theme/app_theme.dart';
 import 'preferences_onboarding_screen.dart';
+import 'auth_gate.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -67,8 +69,13 @@ class ProfileScreen extends StatelessWidget {
               title: const Text('Sign In / Create Account'),
               subtitle: const Text('Save history and sync preferences'),
               trailing: const Icon(Icons.chevron_right),
-              onTap: () {
-                userProvider.signOut(); // Triggers AuthGate to show AuthScreen
+              onTap: () async {
+                await userProvider.signOut(); 
+                // Navigate back to AuthGate, clearing the whole stack
+                Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (_) => AuthGate(isar: Isar.getInstance()!)),
+                  (route) => false,
+                );
               },
             )
           else
@@ -84,7 +91,9 @@ class ProfileScreen extends StatelessWidget {
                     actions: [
                       TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
                       TextButton(
-                        onPressed: () => Navigator.pop(ctx, true), 
+                        onPressed: () async {
+                          Navigator.pop(ctx, true);
+                        },
                         child: const Text('Sign Out', style: TextStyle(color: AppTheme.error)),
                       ),
                     ],
@@ -92,7 +101,12 @@ class ProfileScreen extends StatelessWidget {
                 );
                 
                 if (confirm == true) {
-                  userProvider.signOut();
+                  await userProvider.signOut();
+                  // Navigate to AuthGate
+                  Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => AuthGate(isar: Isar.getInstance()!)),
+                    (route) => false,
+                  );
                 }
               },
             ),

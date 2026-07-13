@@ -6,8 +6,28 @@ import '../../providers/user_provider.dart';
 import '../../theme/app_theme.dart';
 import 'results_screen.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-class InputScreen extends StatelessWidget {
+class InputScreen extends StatefulWidget {
   const InputScreen({super.key});
+
+  @override
+  State<InputScreen> createState() => _InputScreenState();
+}
+
+class _InputScreenState extends State<InputScreen> {
+  late TextEditingController _budgetController;
+
+  @override
+  void initState() {
+    super.initState();
+    final provider = context.read<PlannerProvider>();
+    _budgetController = TextEditingController(text: provider.budget.toStringAsFixed(0));
+  }
+
+  @override
+  void dispose() {
+    _budgetController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +58,21 @@ class InputScreen extends StatelessWidget {
                             const Text('₹', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppTheme.primary)),
                             const SizedBox(width: 8),
                             Expanded(
-                              child: Text(
-                                provider.budget.toStringAsFixed(0),
+                              child: TextField(
+                                controller: _budgetController,
+                                keyboardType: TextInputType.number,
                                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.zero,
+                                ),
+                                onChanged: (val) {
+                                  final parsed = double.tryParse(val);
+                                  if (parsed != null && parsed > 0) {
+                                    provider.updateBudget(parsed);
+                                  }
+                                },
                               ),
                             ),
                           ],
@@ -54,23 +86,70 @@ class InputScreen extends StatelessWidget {
                             overlayColor: AppTheme.primary.withValues(alpha: 0.15),
                             trackHeight: 4,
                           ),
-                          child: Slider(
-                            value: provider.budget.clamp(200, 10000),
-                            min: 200,
-                            max: 10000,
-                            divisions: 98,
-                            onChanged: (v) {
-                              HapticFeedback.selectionClick();
-                              provider.updateBudget(v);
-                            },
+                          child: Semantics(
+                            label: 'Budget slider',
+                            value: '₹${provider.budget.toStringAsFixed(0)}',
+                            child: Slider(
+                              value: provider.budget.clamp(200, 3000),
+                              min: 200,
+                              max: 3000,
+                              divisions: 56, // (3000 - 200) / 50 = 56 steps of ₹50
+                              onChanged: (v) {
+                                HapticFeedback.selectionClick();
+                                provider.updateBudget(v);
+                                _budgetController.text = v.toStringAsFixed(0);
+                              },
+                            ),
                           ),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: const [
                             Text('₹200', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
-                            Text('₹10,000', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+                            Text('₹3,000', style: TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
                           ],
+                        ),
+                        const SizedBox(height: 16),
+                        // Meal Time Dropdown
+                        const Text('When are you eating?', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+                        const SizedBox(height: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: provider.mealTime,
+                              items: ['Now', 'Lunch', 'Dinner', 'Snack'].map((time) {
+                                return DropdownMenuItem(value: time, child: Text(time));
+                              }).toList(),
+                              onChanged: (val) {
+                                if (val != null) provider.updateMealTime(val);
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Discounts
+                        const Text('Discounts', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: AppTheme.textSecondary)),
+                        CheckboxListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text('Zomato Gold (15% off)', style: TextStyle(fontSize: 13)),
+                          value: provider.applyZomatoGold,
+                          onChanged: (v) => provider.toggleZomatoGold(v ?? false),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          activeColor: AppTheme.primary,
+                        ),
+                        CheckboxListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: const Text('Swiggy Dineout (15% off)', style: TextStyle(fontSize: 13)),
+                          value: provider.applySwiggyDineout,
+                          onChanged: (v) => provider.toggleSwiggyDineout(v ?? false),
+                          controlAffinity: ListTileControlAffinity.leading,
+                          activeColor: AppTheme.primary,
                         ),
                         const SizedBox(height: 8),
                         // Per-person budget indicator
@@ -90,7 +169,11 @@ class InputScreen extends StatelessWidget {
                             ),
                             child: Row(
                               children: [
-                                Text(isTooLow ? '⚠️' : '✅', style: const TextStyle(fontSize: 14)),
+                                Icon(
+                                  isTooLow ? Icons.warning_amber_rounded : Icons.check_circle_rounded, 
+                                  size: 16, 
+                                  color: isTooLow ? Colors.red : Colors.green
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   isTooLow
@@ -121,7 +204,7 @@ class InputScreen extends StatelessWidget {
                       children: [
                         _DietCounter(
                           label: 'Vegetarian',
-                          emoji: '🟢',
+                          iconData: Icons.eco,
                           count: provider.vegCount,
                           color: AppTheme.vegGreen,
                           onIncrement: () {
@@ -133,10 +216,38 @@ class InputScreen extends StatelessWidget {
                             provider.updateVegCount(provider.vegCount - 1);
                           },
                         ),
+                        if (provider.vegCount > 0)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8, left: 34),
+                            child: Row(
+                              children: [
+                                SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: Checkbox(
+                                    value: provider.strictPureVeg,
+                                    onChanged: (val) {
+                                      HapticFeedback.selectionClick();
+                                      provider.toggleStrictPureVeg(val ?? false);
+                                    },
+                                    activeColor: AppTheme.vegGreen,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Expanded(
+                                  child: Text(
+                                    'Strict Pure Veg Only (No mixed stalls)',
+                                    style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         const Divider(height: 24),
                         _DietCounter(
                           label: 'Non-Vegetarian',
-                          emoji: '🔴',
+                          iconData: Icons.restaurant,
                           count: provider.nonVegCount,
                           color: AppTheme.nonVegRed,
                           onIncrement: () {
@@ -206,8 +317,8 @@ class InputScreen extends StatelessWidget {
                                     child: Column(
                                       children: [
                                         Text(
-                                          val == 1 ? '1️⃣' : val == 2 ? '2️⃣' : '3️⃣',
-                                          style: const TextStyle(fontSize: 22),
+                                          val.toString(),
+                                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                                         ),
                                         const SizedBox(height: 4),
                                         Text(
@@ -272,7 +383,7 @@ class InputScreen extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: (provider.vegCount + provider.nonVegCount > 0 && !provider.isGenerating)
+                onPressed: (!provider.isGenerateDisabled && !provider.isGenerating)
                     ? () async {
                         HapticFeedback.heavyImpact();
                         
@@ -352,7 +463,7 @@ class _SectionCard extends StatelessWidget {
 
 class _DietCounter extends StatelessWidget {
   final String label;
-  final String emoji;
+  final IconData iconData;
   final int count;
   final Color color;
   final VoidCallback onIncrement;
@@ -360,7 +471,7 @@ class _DietCounter extends StatelessWidget {
 
   const _DietCounter({
     required this.label,
-    required this.emoji,
+    required this.iconData,
     required this.count,
     required this.color,
     required this.onIncrement,
@@ -371,7 +482,7 @@ class _DietCounter extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text(emoji, style: const TextStyle(fontSize: 20)),
+        Icon(iconData, size: 20, color: color),
         const SizedBox(width: 10),
         Expanded(
           child: Text(label, style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600)),
@@ -420,10 +531,14 @@ class _CounterButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: onPressed != null ? color.withValues(alpha: 0.3) : Colors.grey.shade200),
       ),
-      child: IconButton(
-        padding: EdgeInsets.zero,
-        icon: Icon(icon, size: 18, color: onPressed != null ? color : Colors.grey),
-        onPressed: onPressed,
+      child: Semantics(
+        label: 'Counter button $icon',
+        button: true,
+        child: IconButton(
+          padding: EdgeInsets.zero,
+          icon: Icon(icon, size: 18, color: onPressed != null ? color : Colors.grey),
+          onPressed: onPressed,
+        ),
       ),
     );
   }
@@ -465,10 +580,10 @@ class _SummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 10),
-          _SummaryRow('📍 Mall', mallName),
-          _SummaryRow('👥 Group', '${vegCount + nonVegCount} people ($vegCount🟢 + $nonVegCount🔴)'),
-          _SummaryRow('💰 Budget', '₹${budget.toStringAsFixed(0)} (≈₹${perPerson.toStringAsFixed(0)}/person)'),
-          _SummaryRow('🏪 Max Stalls', '$vendorLimit'),
+          _SummaryRow('Location', mallName),
+          _SummaryRow('Group', '${vegCount + nonVegCount} people ($vegCount Veg + $nonVegCount Non-Veg)'),
+          _SummaryRow('Budget', '₹${budget.toStringAsFixed(0)} (≈₹${perPerson.toStringAsFixed(0)}/person)'),
+          _SummaryRow('Max Stalls', '$vendorLimit'),
         ],
       ),
     );

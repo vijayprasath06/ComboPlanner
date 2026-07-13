@@ -70,10 +70,10 @@ class MallSelectorSheet extends StatelessWidget {
                     shrinkWrap: true,
                     padding: const EdgeInsets.fromLTRB(12, 0, 12, 20),
                     itemCount: snapshot.data!.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 6),
-                    itemBuilder: (context, i) {
-                      final mall = snapshot.data![i];
-                      final icon = i < _mallIcons.length ? _mallIcons[i] : Icons.storefront_rounded;
+                    separatorBuilder: (context, index) => const SizedBox(height: 6),
+                    itemBuilder: (context, index) {
+                      final mall = snapshot.data![index];
+                      final icon = index < _mallIcons.length ? _mallIcons[index] : Icons.storefront_rounded;
                       return InkWell(
                         onTap: () {
                           HapticFeedback.lightImpact();

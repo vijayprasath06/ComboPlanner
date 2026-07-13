@@ -64,3 +64,5 @@
     - Replaced default system fonts with `GoogleFonts.outfit` globally for a luxury, geometric aesthetic.
     - Implemented staggered `flutter_animate` micro-animations across all major screens (Home, Input, Results, Auth).
     - Upgraded empty states and remaining emojis to sleek Material Icons.
+    - Fixed device-specific Knapsack generation failures caused by uninitialized Isar double values evaluating to NaN.
+    - Re-architected budget pooling in Knapsack engine to properly mix low-cost and high-cost items globally instead of enforcing rigid per-person limits.

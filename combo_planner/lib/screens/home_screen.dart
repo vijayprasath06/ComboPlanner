@@ -156,11 +156,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: const Icon(Icons.fastfood_rounded, color: Colors.white, size: 28),
                             ),
                             const SizedBox(width: 12),
-                            Text(
-                              'Combo Planner',
-                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w900,
+                            Expanded(
+                              child: Text(
+                                'Combo Planner',
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                ),
                               ),
                             ),
                           ],
@@ -202,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Mall selector
-                  _SectionLabel(label: '📍 Where are you eating?'),
+                  _SectionLabel(label: 'Where are you eating?'),
                   const SizedBox(height: 10),
                   _MallSelectorCard(
                     selectedMallName: provider.selectedMall?.name,
@@ -226,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              '📍 Auto-detected: $_geofenceDetectedMallName',
+                              'Auto-detected: $_geofenceDetectedMallName',
                               style: const TextStyle(
                                 color: AppTheme.vegGreen,
                                 fontWeight: FontWeight.w600,
@@ -244,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   if (hasMall) ...[
                     const SizedBox(height: 16),
-                    _SectionLabel(label: '🔥 Trending Now at ${provider.selectedMall!.name}'),
+                    _SectionLabel(label: 'Trending Now at ${provider.selectedMall!.name}'),
                     const SizedBox(height: 10),
                     if (_combos.isEmpty)
                       Container(
@@ -257,7 +260,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         child: const Column(
                           children: [
-                            Text('🚀', style: TextStyle(fontSize: 32)),
+                            Icon(Icons.rocket_launch, size: 32, color: AppTheme.primary),
                             SizedBox(height: 8),
                             Text(
                               'Be the first to plan here!',
@@ -286,13 +289,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: 32),
 
                     // Info cards row
-                    Row(
-                      children: [
-                        _InfoChip(icon: '🌿', label: 'Veg-friendly'),
-                        const SizedBox(width: 8),
-                        _InfoChip(icon: '📶', label: 'Works Offline'),
-                        const SizedBox(width: 8),
-                        _InfoChip(icon: '💸', label: 'GST Included'),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: const [
+                        _InfoChip(iconData: Icons.eco, label: 'Veg-friendly'),
+                        _InfoChip(iconData: Icons.wifi_off, label: 'Works Offline'),
+                        _InfoChip(iconData: Icons.receipt_long, label: 'GST Included'),
                       ],
                     ),
 
@@ -425,9 +428,9 @@ class _MallSelectorCard extends StatelessWidget {
 }
 
 class _InfoChip extends StatelessWidget {
-  final String icon;
+  final IconData iconData;
   final String label;
-  const _InfoChip({required this.icon, required this.label});
+  const _InfoChip({required this.iconData, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -441,7 +444,7 @@ class _InfoChip extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(icon, style: const TextStyle(fontSize: 13)),
+          Icon(iconData, size: 16, color: AppTheme.primary),
           const SizedBox(width: 4),
           Text(
             label,

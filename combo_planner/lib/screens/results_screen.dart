@@ -61,14 +61,13 @@ class ResultsScreen extends StatelessWidget {
                     const Icon(Icons.warning_amber_rounded, size: 56, color: AppTheme.error),
                     const SizedBox(height: 16),
                     Text(
-                      'Budget Too Tight',
+                      'No Combos Found',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                     const SizedBox(height: 12),
                     Text(
                       'With ₹${provider.budget.toStringAsFixed(0)} for $people people, '
-                      'that’s ₹${(provider.budget / people).toStringAsFixed(0)}/person — '
-                      'below the minimum needed to order a main dish.',
+                      'we could not find any combinations that match your preferences and budget.',
                       textAlign: TextAlign.center,
                       style: const TextStyle(color: AppTheme.textSecondary, height: 1.5),
                     ),
@@ -288,7 +287,7 @@ class _PlanTab extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          isVeg ? '🟢' : '🔴',
+                          isVeg ? 'Veg' : 'Non-Veg',
                           style: const TextStyle(fontSize: 18),
                         ),
                       ),

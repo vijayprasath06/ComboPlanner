@@ -5,4 +5,5 @@ abstract class MenuRepository {
   Future<List<MenuItem>> getItemsForMall(String mallId);
   Future<void> reportPriceMismatch(String internalId, double newPrice);
   Future<List<TrendingCombo>> getTrendingCombos(String mallId);
+  Future<List<MenuItem>> getAlternativesFromStall(String stallId, String engineCategory, String dietaryTag);
 }
